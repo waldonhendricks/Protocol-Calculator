@@ -1,17 +1,58 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Network Protocol Selection Calculator</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
 <body>
-    <h1>Network Protocol Selection Calculator</h1>
-    <div id="calculator">
-        <input id="input1" type="number">
-        <input id="input2" type="number">
-        <button onclick="calculate()">Calculate</button>
-    </div>
-    <p id="result"></p>
-<script src="script.js"></script>
+
+<h1>Network Protocol Selector</h1>
+
+<form id="criteriaForm">
+  <h3>Criteria:</h3>
+  <div id="criteriaInputs">
+    <input type="text" id="criterion1" placeholder="Enter criterion" required>
+    <input type="number" id="weight1" placeholder="Enter weight" min="0" max="1" step="0.01" required>
+    <input type="number" id="scoreNB1" placeholder="Enter NB-IoT score" min="1" max="10" required>
+    <input type="number" id="score5G1" placeholder="Enter 5G score" min="1" max="10" required>
+  </div>
+  <button type="button" onclick="addCriterion()">Add more criteria</button>
+  <button type="submit">Calculate</button>
+</form>
+
+<script>
+let numCriteria = 1;
+
+function addCriterion() {
+  numCriteria++;
+  const newInputs = document.createElement('div');
+  newInputs.innerHTML = `
+    <input type="text" id="criterion${numCriteria}" placeholder="Enter criterion" required>
+    <input type="number" id="weight${numCriteria}" placeholder="Enter weight" min="0" max="1" step="0.01" required>
+    <input type="number" id="scoreNB${numCriteria}" placeholder="Enter NB-IoT score" min="1" max="10" required>
+    <input type="number" id="score5G${numCriteria}" placeholder="Enter 5G score" min="1" max="10" required>
+  `;
+  document.getElementById('criteriaInputs').appendChild(newInputs);
+}
+
+document.getElementById('criteriaForm').addEventListener('submit', function(event) {
+  event.preventDefault();  // prevent form from submitting normally
+  try {
+    let totalScoreNB = 0;
+    let totalScore5G = 0;
+    for (let i = 1; i <= numCriteria; i++) {
+      const weight = parseFloat(document.getElementById(`weight${i}`).value);
+      const scoreNB = parseFloat(document.getElementById(`scoreNB${i}`).value);
+      const score5G = parseFloat(document.getElementById(`score5G${i}`).value);
+      totalScoreNB += weight * scoreNB;
+      totalScore5G += weight * score5G;
+    }
+    if (isNaN(totalScoreNB) || isNaN(totalScore5G)) {
+      throw new Error('Invalid input');
+    } else {
+      alert(`Total score for NB-IoT: ${totalScoreNB.toFixed(2)}, Total score for 5G: ${totalScore5G.toFixed(2)}`);
+    }
+  } catch (error) {
+    alert(error.message);
+  }
+});
+</script>
+
 </body>
 </html>
